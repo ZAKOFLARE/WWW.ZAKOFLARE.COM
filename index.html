@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <link rel="icon" href="copyico.ico" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>加载中...</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+        
+        .animation-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin-bottom: 30px;
+        }
+        
+        .parallelogram {
+            position: absolute;
+            width: 60px;
+            height: 40px;
+            background-color: #4D6BFE;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) skewX(-20deg);
+            transform-origin: bottom center;
+            opacity: 0;
+        }
+        
+        .parallelogram2 {
+            position: absolute;
+            width: 60px;
+            height: 40px;
+            background-color: #DBEAFE;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) skewX(-20deg);
+            transform-origin: bottom center;
+            opacity: 0;
+        }
+        
+        .gradient-para {
+            position: absolute;
+            width: 30px;
+            height: 20px;
+            background: linear-gradient(135deg, #22A7F2, #668E61);
+            transform: skewX(-20deg);
+            opacity: 0;
+        }
+        
+        .status-text {
+            color: #666;
+            text-align: center;
+            margin-top: 20px;
+            height: 20px;
+        }
+        
+        .ip-text {
+            color: #999;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        
+        /* 动画定义 */
+        @keyframes para1Animation {
+            0% { transform: translate(-50%, -50%) skewX(-20deg) scaleY(0); opacity: 0; }
+            15% { transform: translate(-50%, -50%) skewX(-20deg) scaleY(1); opacity: 1; }
+            85% { transform: translate(-50%, -50%) skewX(-20deg) scaleY(1); opacity: 1; }
+            100% { transform: translate(-50%, -50%) skewX(-20deg) scaleY(1); opacity: 0; }
+        }
+        
+        @keyframes para2Animation {
+            0% { transform: translate(-50%, -50%) skewX(-20deg) scaleY(0); opacity: 0; }
+            15% { transform: translate(-40%, 30%) skewX(-20deg) scaleY(1); opacity: 1; }
+            85% { transform: translate(-40%, 30%) skewX(-20deg) scaleY(1); opacity: 1; }
+            100% { transform: translate(-40%, 30%) skewX(-20deg) scaleY(1); opacity: 0; }
+        }
+        
+        @keyframes para3Animation {
+            0% { left: 50%; top: 50%; opacity: 0; transform: skewX(-20deg) scale(0.5); }
+            15% { left: 60%; top: 40%; opacity: 1; transform: skewX(-20deg) scale(1); }
+            70% { left: 60%; top: 40%; opacity: 1; transform: skewX(-20deg) scale(1); }
+            85% { left: 60%; top: 40%; opacity: 0; transform: skewX(-20deg) scale(0.5); }
+            100% { left: 60%; top: 40%; opacity: 0; transform: skewX(-20deg) scale(0.5); }
+        }
+    </style>
+</head>
+<body>
+    <div class="animation-container">
+        <div class="parallelogram" id="para1"></div>
+        <div class="parallelogram2" id="para2"></div>
+        <div class="gradient-para" id="para3"></div>
+    </div>
+    
+    <div class="status-text" id="statusText"></div>
+    <div class="ip-text" id="ipText"></div>
+
+    <script>
+        (function() {
+            // ---------- 动画时长常量 (与原配置保持一致) ----------
+            const ANIMATION_DURATION = 2300; // 毫秒
+
+            // ---------- 获取页面元素 ----------
+            const statusText = document.getElementById('statusText');
+            const ipText = document.getElementById('ipText');
+            const para1 = document.getElementById('para1');
+            const para2 = document.getElementById('para2');
+            const para3 = document.getElementById('para3');
+
+            // ---------- 启动无限循环动画 (完全保留原有视觉效果) ----------
+            function startAnimation() {
+                // 重置动画
+                para1.style.animation = 'none';
+                para2.style.animation = 'none';
+                para3.style.animation = 'none';
+                
+                // 强制重排
+                void para1.offsetWidth;
+                void para2.offsetWidth;
+                void para3.offsetWidth;
+                
+                // 应用动画，保留原有的错峰延迟
+                para1.style.animation = `para1Animation ${ANIMATION_DURATION}ms infinite ease-in-out`;
+                para2.style.animation = `para2Animation ${ANIMATION_DURATION}ms infinite ease-in-out ${ANIMATION_DURATION * 0.15}ms`;
+                para3.style.animation = `para3Animation ${ANIMATION_DURATION}ms infinite ease-in-out ${ANIMATION_DURATION * 0.3}ms`;
+            }
+
+            // ---------- 根据浏览器语言决定目标站点和显示名称 ----------
+            function getTargetInfo() {
+                // 获取浏览器语言 (例如: zh-CN, zh-TW, en-US, ja, ko)
+                const lang = (navigator.language || 'en').toLowerCase();
+                
+                let url = '';
+                let displaySite = '';   // 用于显示在状态文字中
+
+                if (lang.startsWith('zh')) {
+                    // 中文：区分简繁 (简单通过是否包含tw/hk/mo/hant判断)
+                    if (lang.includes('tw') || lang.includes('hk') || lang.includes('mo') || lang.includes('hant')) {
+                        url = 'https://www.zakoflare.com/LNTL-CN/';
+                        displaySite = '繁体中文站 (LNTL-CN)';
+                    } else {
+                        url = 'https://www.zakoflare.com/CN/';
+                        displaySite = '简体中文站 (CN)';
+                    }
+                } else if (lang.startsWith('en')) {
+                    url = 'https://www.zakoflare.com/LNTL-EN/';
+                    displaySite = '英文站 (LNTL-EN)';
+                } else if (lang.startsWith('ja')) {
+                    url = 'https://www.zakoflare.com/LNTL-JP/';
+                    displaySite = '日文站 (LNTL-JP)';
+                } else if (lang.startsWith('ko')) {
+                    url = 'https://www.zakoflare.com/LNTL-KR/';
+                    displaySite = '韩文站 (LNTL-KR)';
+                } else {
+                    // 默认英语
+                    url = 'https://www.zakoflare.com/LNTL-EN/';
+                    displaySite = '英文站 (LNTL-EN)';
+                }
+
+                return { url, displaySite };
+            }
+
+            function initRedirect() {
+                const { url, displaySite } = getTargetInfo();
+
+                // 更新状态文字 
+                statusText.textContent = `根据您浏览器的语言,您将被定向至 ${displaySite}`;
+                // 第二行小字显示具体网址，更友好 (也可留空，此处保留作为额外信息)
+                ipText.textContent = `即将跳转: ${url}`;
+
+                // 启动动画
+                startAnimation();
+
+                // 延时2秒跳转
+                setTimeout(() => {
+                    window.location.href = url;
+                }, 2000);
+            }
+
+            // ---------- 执行 ----------
+            initRedirect();
+        })();
+    </script>
+</body>
+</html>
